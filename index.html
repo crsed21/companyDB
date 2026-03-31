@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KZ Business Database</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-ui: -apple-system,"SF Pro Display","SF Pro Text","Helvetica Neue","Segoe UI",sans-serif;
+  --font-display: 'Cormorant Garamond',Georgia,serif;
+  --bg:#f5f4f1;--surface:#ffffff;--surface2:#f0ede8;--surface3:#e8e4de;
+  --border:#e2ddd6;--border2:#d4cec5;--text:#1c1a17;--text2:#3d3a35;--muted:#8a8278;
+  --accent:#b85a28;--accent2:#d4723a;--accent-light:#f5ebe3;--accent-dim:rgba(184,90,40,0.10);
+  --tag-bg:#eae7e1;--radius:10px;--radius-lg:16px;
+  --shadow:0 1px 12px rgba(0,0,0,0.06),0 4px 20px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 48px rgba(0,0,0,0.12),0 2px 12px rgba(0,0,0,0.06);
+  --dev:#5b3cb0;--dev-light:#ede8f7;--success:#287a40;--success-bg:#e4f2e9;--error:#b83228;--error-bg:#fce8e6;
+  --icon-filter:brightness(0) saturate(100%);
+}
+[data-theme="dark"] {
+  --bg:#0f0e0d;--surface:#1a1917;--surface2:#222019;--surface3:#2a2722;
+  --border:#2c2a26;--border2:#383430;--text:#f2ede6;--text2:#ccc5bb;--muted:#706b62;
+  --accent:#e07840;--accent2:#e89060;--accent-light:#271a10;--accent-dim:rgba(224,120,64,0.12);
+  --tag-bg:#232019;--shadow:0 1px 12px rgba(0,0,0,0.4),0 4px 20px rgba(0,0,0,0.3);
+  --shadow-lg:0 8px 48px rgba(0,0,0,0.6);--dev-light:#1c1528;
+  --icon-filter:brightness(0) saturate(100%) invert(1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+
+/* LOGO */
+.logo-mark{display:flex;align-items:center;gap:12px;text-decoration:none;user-select:none}
+.logo-emblem{width:44px;height:44px;background:var(--accent);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(184,90,40,0.32);transition:transform .15s}
+.logo-emblem:hover{transform:scale(1.04)}
+.logo-emblem svg{width:22px;height:22px;stroke:white;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.logo-text-wrap{display:flex;flex-direction:column;line-height:1.15}
+.logo-primary{font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:.01em;color:var(--text)}
+.logo-sub{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:72px;position:sticky;top:0;z-index:200;transition:background .25s,border-color .25s}
+.header-right{display:flex;align-items:center;gap:8px}
+.header-meta{font-size:12px;color:var(--muted);font-weight:400;letter-spacing:.01em;margin-right:6px}
+
+/* ICON BUTTONS */
+.icon-btn{width:36px;height:36px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}
+.icon-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--text);opacity:.55;transition:opacity .15s,color .15s}
+.icon-btn:hover{border-color:var(--accent);background:var(--accent-light)}
+.icon-btn:hover svg{color:var(--accent);opacity:1}
+.icon-btn.dev-active{border-color:var(--dev);background:var(--dev-light)}
+.icon-btn.dev-active svg{color:var(--dev);opacity:1}
+[data-theme="dark"] .btn-primary{outline:2px solid rgba(255,255,255,.18);outline-offset:1px}
+[data-theme="dark"] .btn-secondary{outline:2px solid rgba(224,120,64,.3);outline-offset:1px}
+[data-theme="dark"] .dev-btn{outline:2px solid rgba(255,255,255,.12);outline-offset:1px}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:264px 1fr;min-height:calc(100vh - 72px)}
+
+/* SIDEBAR */
+aside{background:var(--surface);border-right:1px solid var(--border);padding:22px 14px;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;transition:background .25s,border-color .25s}
+.sidebar-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;padding:0 4px}
+.search-wrap{position:relative;margin-bottom:18px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+input[type="text"],select{width:100%;padding:8px 10px 8px 32px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-ui);font-size:13px;font-weight:400;background:var(--surface2);color:var(--text);outline:none;transition:border-color .2s,background .25s;letter-spacing:.01em}
+select{padding-left:10px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8278' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+input[type="text"]:focus,select:focus{border-color:var(--accent);background:var(--surface)}
+.filter-group{margin-bottom:18px}
+.cat-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 8px;border:none;background:transparent;border-radius:7px;font-family:var(--font-ui);font-size:13px;font-weight:400;color:var(--text2);cursor:pointer;transition:background .12s;text-align:left;margin-bottom:1px;letter-spacing:.01em}
+.cat-btn:hover{background:var(--surface2)}
+.cat-btn.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.cat-count{font-size:11px;color:var(--muted);background:var(--surface3);padding:1px 6px;border-radius:20px;min-width:20px;text-align:center;font-weight:500}
+.cat-btn.active .cat-count{background:var(--accent);color:white}
+
+/* MAIN */
+main{padding:24px 28px;overflow-y:auto}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.results-count{font-size:13px;color:var(--muted);font-weight:400}
+.results-count strong{color:var(--text);font-weight:500}
+.view-toggle{display:flex;gap:3px}
+.view-btn{width:32px;height:32px;border:1px solid var(--border);border-radius:7px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;color:var(--muted)}
+.view-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.view-btn.active,.view-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+
+/* GRID & CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:12px}
+.list{display:flex;flex-direction:column;gap:6px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;cursor:pointer;transition:box-shadow .18s,border-color .18s,transform .14s;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));opacity:0;transition:opacity .18s;border-radius:2px 0 0 2px}
+.card:hover{box-shadow:var(--shadow);border-color:var(--border2);transform:translateY(-1px)}
+.card:hover::after{opacity:1}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.company-name{font-family:var(--font-display);font-size:17px;font-weight:600;line-height:1.25;flex:1;color:var(--text);letter-spacing:.01em}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0;margin-top:6px}
+.cat-tag{display:inline-block;font-size:10.5px;padding:2px 8px;background:var(--tag-bg);border-radius:20px;color:var(--muted);font-weight:500;margin-bottom:8px;letter-spacing:.03em}
+.card-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+.card-row svg{stroke:currentColor;fill:none;stroke-width:2.2;flex-shrink:0}
+.card-row a{color:var(--accent);text-decoration:none}
+.card-row a:hover{text-decoration:underline}
+.card-ceo{border-top:1px solid var(--border);margin-top:10px;padding-top:8px}
+.card-ceo-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px;font-weight:600}
+.card-ceo-name{font-weight:500;color:var(--text);font-size:12.5px}
+.person-pos-short{font-size:11px;color:var(--muted);margin-top:1px}
+.social-badges{display:flex;gap:4px;margin-top:8px}
+.badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
+.badge.active{background:var(--success-bg);color:var(--success)}
+.badge.inactive{background:var(--tag-bg);color:var(--muted)}
+.list .card{display:grid;grid-template-columns:2fr 1.2fr 1.4fr 0.8fr auto;align-items:center;gap:12px;padding:10px 16px;border-radius:var(--radius)}
+.list .card::after{display:none}
+.list .card-header{margin-bottom:0;flex-direction:column;gap:2px}
+.list .cat-tag{margin-bottom:0}
+.list .card-ceo,.list .social-badges,.list .card-row{border:none;padding:0;margin:0}
+.list .status-dot{display:none}
+.list .company-name{font-size:14px}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(10,8,6,.5);z-index:300;backdrop-filter:blur(6px)}
+.overlay.open{display:flex;align-items:flex-start;justify-content:flex-end}
+.modal{background:var(--surface);width:480px;height:100%;overflow-y:auto;padding:32px 28px;animation:slideIn .2s ease-out;position:relative}
+@keyframes slideIn{from{transform:translateX(32px);opacity:0}to{transform:none;opacity:1}}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border:1px solid var(--border);border-radius:50%;background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;transition:all .12s}
+.modal-close:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+.modal-cat{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600;margin-bottom:6px}
+.modal-title{font-family:var(--font-display);font-size:26px;font-weight:600;line-height:1.2;margin-bottom:20px;letter-spacing:.01em}
+.modal-section{margin-bottom:22px}
+.modal-section h4{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.info-row{display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start}
+.info-label{color:var(--muted);font-weight:400;min-width:74px;flex-shrink:0;font-size:12.5px}
+.info-value{color:var(--text);word-break:break-word;font-weight:400}
+.info-value a{color:var(--accent);text-decoration:none}
+.info-value a:hover{text-decoration:underline}
+.person-card{background:var(--surface2);border-radius:9px;padding:11px 13px;margin-bottom:7px}
+.person-role{font-size:9.5px;color:var(--muted);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.person-name{font-size:13.5px;font-weight:500}
+.person-pos{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.social-link{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;text-decoration:none;font-size:12.5px;font-weight:400;color:var(--text);transition:all .12s}
+.social-link:hover{border-color:var(--accent);color:var(--accent)}
+
+/* EMPTY */
+.empty{grid-column:1/-1;text-align:center;padding:72px 20px;color:var(--muted)}
+.empty svg{margin-bottom:14px;opacity:.2;stroke:currentColor;fill:none;stroke-width:1.5}
+.empty h3{font-size:15px;margin-bottom:5px;font-weight:500}
+.empty p{font-size:13px}
+
+/* STATUS */
+.status-msg{font-size:12px;text-align:center;padding:6px 10px;border-radius:6px;margin-top:8px;font-weight:400}
+.status-msg.success{background:var(--success-bg);color:var(--success)}
+.status-msg.error{background:var(--error-bg);color:var(--error)}
+
+/* BUTTONS */
+.btn-primary{padding:8px 18px;border:none;border-radius:8px;background:var(--accent);color:white;font-family:var(--font-ui);font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.01em}
+.btn-primary:hover{opacity:.88}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-secondary{padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-family:var(--font-ui);font-size:13px;font-weight:400;cursor:pointer;transition:all .15s;letter-spacing:.01em}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:7px 12px;border:none;border-radius:7px;cursor:pointer;font-family:var(--font-ui);font-size:12px;font-weight:500;background:var(--accent);color:white;transition:opacity .15s}
+.btn-sm:hover{opacity:.85}
+
+/* DEV BAR */
+.dev-bar{background:var(--dev-light);border-bottom:2px solid var(--dev);padding:7px 28px;display:none;align-items:center;justify-content:space-between;gap:12px}
+.dev-bar.visible{display:flex}
+.dev-label{font-size:11.5px;font-weight:600;color:var(--dev);display:flex;align-items:center;gap:6px}
+.dev-actions{display:flex;gap:6px}
+.dev-btn{padding:5px 12px;border:1px solid var(--dev);border-radius:6px;background:transparent;color:var(--dev);font-family:var(--font-ui);font-size:11.5px;font-weight:500;cursor:pointer;transition:all .12s}
+.dev-btn:hover{background:var(--dev);color:white}
+.dev-btn.danger{border-color:var(--error);color:var(--error)}
+.dev-btn.danger:hover{background:var(--error);color:white}
+
+/* DEV PANEL */
+.dev-panel{display:none;background:var(--surface);border:1px solid var(--dev);border-radius:var(--radius);margin:0 28px 18px;padding:20px}
+.dev-panel.visible{display:block}
+.dev-tabs{display:flex;gap:3px;margin-bottom:18px;border-bottom:1px solid var(--border)}
+.dev-tab{padding:7px 14px;border:none;background:transparent;font-family:var(--font-ui);font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s}
+.dev-tab.active{color:var(--dev);border-bottom-color:var(--dev)}
+.dev-tab-content{display:none}
+.dev-tab-content.active{display:block}
+.db-table-wrap{overflow:auto;max-height:380px;border:1px solid var(--border);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--surface2);padding:8px 11px;text-align:left;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0;white-space:nowrap}
+td{padding:7px 11px;border-bottom:1px solid var(--border);font-weight:400;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:hover td{background:var(--surface2)}
+tr:last-child td{border-bottom:none}
+.td-actions{display:flex;gap:3px}
+.btn-icon{width:25px;height:25px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.btn-icon:hover{background:var(--accent-light);border-color:var(--accent)}
+.btn-icon.del:hover{background:var(--error-bg);border-color:var(--error)}
+.add-form{background:var(--surface2);border-radius:9px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.add-form input,.add-form select{padding:7px 9px;font-size:12.5px}
+.add-form-actions{grid-column:1/-1;display:flex;gap:7px;justify-content:flex-end}
+.dev-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat-card{background:var(--surface2);border-radius:9px;padding:14px}
+.stat-card .val{font-family:var(--font-display);font-size:28px;font-weight:600;color:var(--accent)}
+.stat-card .lbl{font-size:11.5px;color:var(--muted);font-weight:400;margin-top:3px}
+
+/* AI MODAL */
+.ai-modal{display:none;position:fixed;inset:0;background:rgba(10,8,6,.55);z-index:400;backdrop-filter:blur(6px);align-items:center;justify-content:center}
+.ai-modal.open{display:flex}
+.ai-box{background:var(--surface);border-radius:18px;width:660px;max-width:96vw;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);animation:popIn .2s ease-out}
+@keyframes popIn{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
+.ai-header{padding:20px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ai-title{font-family:var(--font-display);font-size:18px;font-weight:600;display:flex;align-items:center;gap:10px;letter-spacing:.01em}
+.ai-badge{font-family:var(--font-ui);font-size:9.5px;background:linear-gradient(135deg,#5b3cb0,#b85a28);color:white;padding:2px 8px;border-radius:20px;font-weight:600;letter-spacing:.05em}
+.ai-body{padding:20px 22px;flex:1;overflow-y:auto}
+.ai-instructions{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.6}
+.ai-result{margin-top:14px;display:none}
+.ai-result.visible{display:block}
+.ai-result-card{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px;font-size:12.5px}
+.ai-result-field{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)}
+.ai-result-field:last-child{border-bottom:none}
+.ai-result-key{color:var(--muted);min-width:116px;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.ai-result-val{color:var(--text);font-weight:400}
+.ai-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end}
+.ai-loading{display:none;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-top:12px}
+.ai-loading.visible{display:flex}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN MODAL */
+.login-modal{display:none;position:fixed;inset:0;background:rgba(10,8,6,.6);z-index:500;backdrop-filter:blur(8px);align-items:center;justify-content:center}
+.login-modal.open{display:flex}
+.login-box{background:var(--surface);border-radius:18px;width:340px;padding:32px 28px;box-shadow:var(--shadow-lg);animation:popIn .2s ease-out}
+.login-icon{width:44px;height:44px;background:var(--surface2);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;border:1px solid var(--border)}
+.login-icon svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round}
+.login-title{font-family:var(--font-display);font-size:21px;font-weight:600;margin-bottom:4px;letter-spacing:.01em}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:22px}
+.login-field{margin-bottom:12px}
+.login-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
+.login-input{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-family:var(--font-ui);font-size:13.5px;font-weight:400;background:var(--surface2);color:var(--text);outline:none;transition:border-color .18s}
+.login-input:focus{border-color:var(--accent);background:var(--surface)}
+.login-error{font-size:12px;color:var(--error);margin-bottom:10px;display:none}
+.login-actions{display:flex;gap:7px;margin-top:18px}
+.edit-field{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font-ui);font-size:12.5px;font-weight:400;background:var(--surface);color:var(--text);outline:none;transition:border-color .18s}
+.edit-field:focus{border-color:var(--accent)}
+
+/* SYNC MODAL */
+.sync-modal{display:none;position:fixed;inset:0;background:rgba(10,8,6,.55);z-index:450;backdrop-filter:blur(6px);align-items:center;justify-content:center}
+.sync-modal.open{display:flex}
+.sync-box{background:var(--surface);border-radius:18px;width:780px;max-width:96vw;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);animation:popIn .2s ease-out}
+.sync-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sync-title{font-family:var(--font-display);font-size:19px;font-weight:600;display:flex;align-items:center;gap:10px}
+.sync-badge{font-family:var(--font-ui);font-size:9.5px;background:var(--accent);color:white;padding:2px 8px;border-radius:20px;font-weight:600;letter-spacing:.05em}
+.sync-body{padding:20px 24px;flex:1;overflow-y:auto}
+.sync-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.sync-stat{background:var(--surface2);border-radius:10px;padding:13px 14px;border:1px solid var(--border)}
+.sync-stat .s-val{font-family:var(--font-display);font-size:26px;font-weight:600}
+.sync-stat .s-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.sync-stat.new .s-val{color:var(--success)}
+.sync-stat.removed .s-val{color:var(--error)}
+.sync-stat.changed .s-val{color:var(--accent)}
+.sync-stat.same .s-val{color:var(--muted)}
+.sync-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;margin-top:18px;display:flex;align-items:center;gap:7px}
+.sync-section-label span{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 6px;border-radius:10px;font-size:10px;font-weight:600}
+.sync-section-label .badge-new{background:var(--success-bg);color:var(--success)}
+.sync-section-label .badge-removed{background:var(--error-bg);color:var(--error)}
+.sync-section-label .badge-changed{background:var(--accent-light);color:var(--accent)}
+.sync-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;margin-bottom:3px;font-size:13px;border:1px solid transparent}
+.sync-row.new{background:var(--success-bg);border-color:rgba(40,122,64,.15)}
+.sync-row.removed{background:var(--error-bg);border-color:rgba(184,50,40,.15)}
+.sync-row.changed{background:var(--accent-light);border-color:rgba(184,90,40,.15)}
+.sync-row-name{font-weight:500;color:var(--text)}
+.sync-row-meta{font-size:11.5px;color:var(--muted)}
+.sync-row-actions{display:flex;gap:5px;flex-shrink:0}
+.sync-diff{margin-top:0;padding:0 12px 8px;display:none;background:var(--surface2);border-radius:0 0 8px 8px;margin-bottom:3px}
+.sync-diff.open{display:block}
+.sync-diff-item{font-size:11.5px;padding:4px 0;display:flex;gap:8px;border-bottom:1px solid var(--border);color:var(--muted)}
+.sync-diff-item:last-child{border-bottom:none}
+.sync-diff-field{font-weight:600;min-width:90px;color:var(--text2)}
+.sync-diff-old{color:var(--error);text-decoration:line-through;flex:1;word-break:break-all}
+.sync-diff-arrow{color:var(--muted);flex-shrink:0}
+.sync-diff-new{color:var(--success);flex:1;word-break:break-all}
+.sync-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:space-between;align-items:center;flex-shrink:0}
+.sync-footer-note{font-size:12px;color:var(--muted)}
+.sync-loading{display:flex;align-items:center;gap:10px;padding:36px;justify-content:center;color:var(--muted);font-size:13px}
+.sync-empty{text-align:center;padding:36px;color:var(--muted);font-size:13px}
+.sync-btn-expand{background:none;border:none;cursor:pointer;color:var(--accent);font-size:11px;font-weight:500;padding:0;font-family:var(--font-ui)}
+.sync-btn-expand:hover{text-decoration:underline}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- SYNC MODAL -->
+<div class="sync-modal" id="syncModal">
+  <div class="sync-box">
+    <div class="sync-header">
+      <div class="sync-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        Синхронизация с Google Drive <span class="sync-badge">Drive</span>
+      </div>
+      <button class="modal-close" onclick="closeSyncModal()">✕</button>
+    </div>
+    <div class="sync-body" id="syncBody">
+      <div class="sync-loading" id="syncLoading"><div class="spinner"></div> Загружаю данные из Drive...</div>
+      <div id="syncContent" style="display:none"></div>
+    </div>
+    <div class="sync-footer" id="syncFooter" style="display:none">
+      <div class="sync-footer-note" id="syncFooterNote"></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn-secondary" onclick="closeSyncModal()">Закрыть</button>
+        <button class="btn-primary" id="syncApplyBtn" onclick="applySyncFromDrive()" style="display:none">Объединить с Drive</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="login-modal" id="loginModal">
+  <div class="login-box">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div class="login-title">Режим разработчика</div>
+    <div class="login-sub">Введите учётные данные</div>
+    <div class="login-field">
+      <label class="login-label">Логин</label>
+      <input class="login-input" type="text" id="loginUser" placeholder="admin">
+    </div>
+    <div class="login-field">
+      <label class="login-label">Пароль</label>
+      <input class="login-input" type="password" id="loginPass" placeholder="••••••">
+    </div>
+    <div class="login-error" id="loginError">Неверный логин или пароль</div>
+    <div class="login-actions">
+      <button class="btn-secondary" style="flex:1" onclick="closeLoginModal()">Отмена</button>
+      <button class="btn-primary" style="flex:1" onclick="submitLogin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI PARSER MODAL -->
+<div class="ai-modal" id="aiModal">
+  <div class="ai-box">
+    <div class="ai-header">
+      <div class="ai-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Smart Parser <span class="ai-badge">AI · Dev</span>
+      </div>
+      <button class="modal-close" onclick="closeAiModal()">✕</button>
+    </div>
+    <div class="ai-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">Введите название компании — AI найдёт информацию в интернете и автоматически заполнит все поля.</p>
+      <div style="position:relative">
+        <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="aiInput" placeholder="Kaspi Bank, KazMunayGas, Halyk Bank..." style="padding:11px 14px 11px 36px;font-size:14px;width:100%;border-radius:9px;">
+      </div>
+      <div class="ai-instructions">AI использует web search чтобы найти: контакты, адрес, руководство, сайт, соцсети.</div>
+      <div class="ai-loading" id="aiLoading">
+        <div class="spinner"></div> <span id="aiLoadingText">Ищу информацию...</span>
+      </div>
+      <div class="ai-result" id="aiResult">
+        <div style="font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;margin-top:14px;display:flex;align-items:center;gap:8px">
+          <span>Найденные данные</span>
+          <span id="aiSourceBadge" style="background:var(--success-bg);color:var(--success);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500">Из интернета</span>
+        </div>
+        <div class="ai-result-card" id="aiResultCard"></div>
+        <div id="aiEditSection" style="margin-top:12px;display:none">
+          <div style="font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Редактировать</div>
+          <div id="aiEditFields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ai-footer">
+      <button class="btn-secondary" onclick="closeAiModal()">Отмена</button>
+      <button class="btn-secondary" id="aiEditToggle" onclick="toggleAiEdit()" style="display:none">Редактировать</button>
+      <button class="btn-primary" id="aiParseBtn" onclick="runAiParse()">Найти в интернете</button>
+      <button class="btn-primary" id="aiAddBtn" onclick="addParsedCompany()" style="display:none;background:var(--success)">Добавить в базу</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-mark">
+    <div class="logo-emblem">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="logo-text-wrap">
+      <span class="logo-primary">KZ Business</span>
+      <span class="logo-sub">Database</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-meta" id="lastUpdated">Загрузка...</div>
+    <button class="icon-btn" id="aiBtn" onclick="openAiModal()" title="Smart Parser" style="display:none">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>
+    </button>
+    <button class="icon-btn" id="syncBtn" onclick="openSyncModal()" title="Синхронизация с Drive">
+      <svg viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+    </button>
+    <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Тема">
+      <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="icon-btn" id="devBtn" onclick="toggleDevMode()" title="Разработчик">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M12 20v2M19.07 19.07l-1.41-1.41M20 12h2"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- DEV BAR -->
+<div class="dev-bar" id="devBar">
+  <div class="dev-label">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M12 20v2M19.07 19.07l-1.41-1.41M20 12h2"/></svg>
+    Режим разработчика
+  </div>
+  <div class="dev-actions">
+    <button class="dev-btn" onclick="toggleDevPanel()">База данных</button>
+    <button class="dev-btn" onclick="exportData()">Экспорт JSON</button>
+    <button class="dev-btn" onclick="exportCsv()">Экспорт CSV</button>
+    <button class="dev-btn danger" onclick="clearDatabase()">Очистить базу</button>
+  </div>
+</div>
+
+<!-- DEV PANEL -->
+<div class="dev-panel" id="devPanel">
+  <div class="dev-tabs">
+    <button class="dev-tab active" onclick="switchDevTab('stats',this)">Статистика</button>
+    <button class="dev-tab" onclick="switchDevTab('table',this)">Таблица</button>
+    <button class="dev-tab" onclick="switchDevTab('add',this)">Добавить</button>
+  </div>
+  <div class="dev-tab-content active" id="devStats"><div class="dev-stats" id="statsGrid"></div></div>
+  <div class="dev-tab-content" id="devTable">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <input type="text" id="devSearch" placeholder="Поиск..." style="width:220px;padding:7px 10px;font-size:12.5px" oninput="renderDevTable()">
+    </div>
+    <div class="db-table-wrap" id="dbTableWrap"></div>
+  </div>
+  <div class="dev-tab-content" id="devAdd">
+    <div class="add-form" id="addForm">
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Название *</label><input class="login-input" type="text" id="af-name" placeholder="Company name"></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Категория</label><select id="af-cat" style="width:100%;padding:8px 9px;font-size:12.5px"></select></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Город</label><input class="login-input" type="text" id="af-city" placeholder="Алматы"></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Сайт</label><input class="login-input" type="text" id="af-web" placeholder="https://..."></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Email</label><input class="login-input" type="text" id="af-email" placeholder="info@..."></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Телефон</label><input class="login-input" type="text" id="af-phone" placeholder="+7..."></div>
+      <div style="grid-column:1/-1"><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Адрес</label><input class="login-input" type="text" id="af-addr" placeholder="Адрес компании"></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Руководитель</label><input class="login-input" type="text" id="af-ceo1" placeholder="ФИО"></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Должность</label><input class="login-input" type="text" id="af-pos1" placeholder="Председатель"></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">LinkedIn</label><input class="login-input" type="text" id="af-li" placeholder="handle"></div>
+      <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">Facebook</label><input class="login-input" type="text" id="af-fb" placeholder="handle"></div>
+      <div class="add-form-actions">
+        <button class="btn-secondary" onclick="clearAddForm()">Очистить</button>
+        <button class="btn-primary" onclick="addRecord()">Добавить</button>
+      </div>
+    </div>
+    <div id="addStatus" class="status-msg" style="margin-top:10px;display:none"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app">
+  <aside>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Поиск компании...">
+    </div>
+    <div class="filter-group">
+      <div class="sidebar-label">Категория</div>
+      <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">Все <span class="cat-count" id="count-all">0</span></button>
+      <div id="catButtons"></div>
+    </div>
+    <div class="filter-group">
+      <div class="sidebar-label">Город</div>
+      <select id="citySelect" onchange="applyFilters()"><option value="">Все города</option></select>
+    </div>
+  </aside>
+  <main>
+    <div class="top-bar">
+      <div class="results-count"><strong id="shownCount">0</strong> из <strong id="totalCount">0</strong> компаний</div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="gridBtn" onclick="setView('grid')" title="Сетка">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="view-btn" id="listBtn" onclick="setView('list')" title="Список">
+          <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="grid" id="companiesGrid"></div>
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal(null,true)">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const SERVER='http://localhost:8000';
+let data=[],filteredData=[],currentCat='all',currentCity='',viewMode='grid',devMode=false,isDark=false,parsedAiCompany=null,editingIdx=null,saveTimer=null;
+
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveToServer,800)}
+async function saveToServer(){try{const r=await fetch(`${SERVER}/api/save-all`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data})});if(r.ok){const t=new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});document.getElementById('lastUpdated').textContent=`${data.length} компаний · ${t}`}}catch(e){console.warn('save:',e.message)}}
+
+let autoRefreshTimer=null;
+const AUTO_REFRESH_INTERVAL=30000;
+const MERGE_COLS=['Category','Status','City','Website','Email','Phone','Address','CEO-1','Position-1','CEO-2','Position-2','Linkedin','Status-L','Facebook','Status-F'];
+
+// ── ЗАГРУЗКА ──────────────────────────────────────────────────────────────────
+async function autoLoad(){
+  document.getElementById('lastUpdated').textContent='Загрузка...';
+  try{
+    const r=await fetch(`${SERVER}/api/load-local`);
+    if(!r.ok)throw new Error(r.status);
+    const res=await r.json();
+    if(!res.success)throw new Error(res.error);
+    data=res.data||[];filteredData=[...data];
+    rebuildFilters(`${data.length} компаний`);applyFilters();
+    if(devMode){renderDevTable();renderStats()}
+  }catch(e){
+    document.getElementById('lastUpdated').textContent='Сервер недоступен';
+    console.warn('load:',e.message);
+  }
+  startAutoRefresh();
+}
+
+// ── АВТООБНОВЛЕНИЕ КАЖДЫЕ 30 С ────────────────────────────────────────────────
+function startAutoRefresh(){
+  if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+  autoRefreshTimer=setInterval(silentRefresh,AUTO_REFRESH_INTERVAL);
+}
+
+async function silentRefresh(){
+  if(saveTimer)return; // идёт сохранение — не перебиваем
+  try{
+    const r=await fetch(`${SERVER}/api/reload`);
+    if(!r.ok)return;
+    const res=await r.json();
+    if(!res.success||!res.refreshed)return; // Drive не обновлялся — пропускаем
+    const result=mergeData(data,res.data||[]);
+    if(!result.changed)return;
+    data=result.merged;filteredData=[...data];
+    rebuildFilters();applyFilters();
+    if(devMode){renderDevTable();renderStats()}
+    scheduleSave(); // сохраняем объединённый результат обратно
+    const t=new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    result.conflicts.length>0?showConflictToast(result.conflicts,t):showRefreshBadge(`Обновлено из Drive · ${t}`);
+  }catch(e){console.warn('silent-refresh:',e.message)}
+}
+
+// ── FIELD-LEVEL MERGE ─────────────────────────────────────────────────────────
+// Правила на каждое поле:
+//   сайт пусто  + Drive заполнено → берём Drive
+//   сайт заполнено + Drive пусто  → сайт сохраняет своё
+//   оба заполнены и разные        → Drive побеждает, фиксируем конфликт
+//   совпадают                     → без изменений
+function mergeData(local,remote){
+  const localMap={},remoteMap={};
+  local.forEach(d=>{if(d['Company name'])localMap[(d['Company name']||'').toLowerCase()]=d});
+  remote.forEach(d=>{if(d['Company name'])remoteMap[(d['Company name']||'').toLowerCase()]=d});
+  const allKeys=new Set([...Object.keys(localMap),...Object.keys(remoteMap)]);
+  const merged=[],conflicts=[];let changed=false;
+  allKeys.forEach(k=>{
+    const loc=localMap[k],rem=remoteMap[k];
+    if(!loc&&rem){merged.push({...rem});changed=true;return}
+    if(loc&&!rem){changed=true;return}
+    const rec={...loc};
+    MERGE_COLS.forEach(col=>{
+      const lv=(loc[col]||'').trim(),rv=(rem[col]||'').trim();
+      if(lv===rv)return;
+      if(!lv&&rv){rec[col]=rv;changed=true;return}
+      if(lv&&!rv)return;
+      rec[col]=rv;changed=true;
+      conflicts.push({company:loc['Company name'],field:col,site:lv,drive:rv});
+    });
+    merged.push(rec);
+  });
+  return{merged,changed,conflicts};
+}
+
+// ── УВЕДОМЛЕНИЯ ──────────────────────────────────────────────────────────────
+function showRefreshBadge(text){
+  const el=document.getElementById('lastUpdated');
+  el.textContent=text;el.style.color='var(--success)';el.style.fontWeight='500';
+  setTimeout(()=>{el.style.color='';el.style.fontWeight='';el.textContent=`${data.length} компаний`},4000);
+}
+let conflictToastTimer=null;
+function showConflictToast(conflicts,t){
+  let toast=document.getElementById('conflictToast');
+  if(!toast){toast=document.createElement('div');toast.id='conflictToast';
+    toast.style.cssText='position:fixed;bottom:22px;right:22px;z-index:999;background:var(--surface);border:1px solid var(--accent);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow-lg);min-width:300px;max-width:400px;animation:popIn .2s ease-out';
+    document.body.appendChild(toast);}
+  const names=[...new Set(conflicts.map(c=>c.company))].slice(0,3);
+  const more=conflicts.length>3?` и ещё ${conflicts.length-3} поля`:'';
+  toast.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:4px">Drive обновлён · ${t}</div>
+      <div style="font-size:12px;color:var(--text);line-height:1.5">Поля объединены. При конфликте победил Drive:</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:5px">${names.join(', ')}${more}</div>
+    </div>
+    <button onclick="document.getElementById('conflictToast').remove()" style="border:none;background:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;flex-shrink:0">✕</button>
+  </div>`;
+  if(conflictToastTimer)clearTimeout(conflictToastTimer);
+  conflictToastTimer=setTimeout(()=>toast?.remove(),7000);
+  showRefreshBadge(`Обновлено из Drive · ${t}`);
+}
+
+// ── SYNC MODAL ────────────────────────────────────────────────────────────────
+let syncDriveData=null;
+function openSyncModal(){
+  document.getElementById('syncModal').classList.add('open');
+  document.getElementById('syncLoading').style.display='flex';
+  document.getElementById('syncContent').style.display='none';
+  document.getElementById('syncFooter').style.display='none';
+  syncDriveData=null;loadDriveDataForSync();
+}
+function closeSyncModal(){document.getElementById('syncModal').classList.remove('open')}
+async function loadDriveDataForSync(){
+  try{
+    const r=await fetch(`${SERVER}/api/load-local`);
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const res=await r.json();
+    if(!res.success)throw new Error(res.error||'Ошибка загрузки');
+    syncDriveData=res.data||[];buildSyncDiff();
+  }catch(e){
+    document.getElementById('syncLoading').innerHTML=`<div style="color:var(--error);font-size:13px;text-align:center"><b>Не удалось загрузить данные из Drive</b><br><span style="font-size:12px;color:var(--muted)">${e.message}</span></div>`;
+  }
+}
+function buildSyncDiff(){
+  const localMap={},remoteMap={};
+  data.forEach(d=>{if(d['Company name'])localMap[(d['Company name']||'').toLowerCase()]=d});
+  syncDriveData.forEach(d=>{if(d['Company name'])remoteMap[(d['Company name']||'').toLowerCase()]=d});
+  const allKeys=new Set([...Object.keys(localMap),...Object.keys(remoteMap)]);
+  const added=[],removed=[],changed=[],same=[];
+  allKeys.forEach(k=>{
+    const loc=localMap[k],drv=remoteMap[k];
+    if(drv&&!loc){added.push(drv);return}
+    if(loc&&!drv){removed.push(loc);return}
+    const diffs=[];
+    MERGE_COLS.forEach(col=>{
+      const lv=(loc[col]||'').trim(),dv=(drv[col]||'').trim();
+      if(lv!==dv)diffs.push({field:col,local:lv,drive:dv});
+    });
+    diffs.length>0?changed.push({local:loc,drive:drv,diffs}):same.push(loc);
+  });
+  renderSyncContent({added,removed,changed,same});
+}
+function renderSyncContent({added,removed,changed,same}){
+  const total=added.length+removed.length+changed.length;
+  let html=`<div class="sync-summary">
+    <div class="sync-stat new"><div class="s-val">${added.length}</div><div class="s-lbl">Только в Drive</div></div>
+    <div class="sync-stat removed"><div class="s-val">${removed.length}</div><div class="s-lbl">Только локально</div></div>
+    <div class="sync-stat changed"><div class="s-val">${changed.length}</div><div class="s-lbl">Расхождения</div></div>
+    <div class="sync-stat same"><div class="s-val">${same.length}</div><div class="s-lbl">Совпадают</div></div>
+  </div>`;
+  if(total===0){
+    html+=`<div class="sync-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.2;display:block;margin:0 auto 12px"><path d="M20 6 9 17l-5-5"/></svg>Данные полностью совпадают. Синхронизация не требуется.</div>`;
+  }else{
+    if(added.length>0){
+      html+=`<div class="sync-section-label">Новые в Drive <span class="badge-new">${added.length}</span></div>`;
+      added.forEach(d=>{html+=`<div class="sync-row new"><div><div class="sync-row-name">${d['Company name']}</div><div class="sync-row-meta">${[d['Category'],d['City']].filter(Boolean).join(' · ')}</div></div><span style="font-size:11px;color:var(--success);font-weight:500">+ добавится</span></div>`;});
+    }
+    if(removed.length>0){
+      html+=`<div class="sync-section-label">Удалены в Drive <span class="badge-removed">${removed.length}</span></div>`;
+      removed.forEach(d=>{html+=`<div class="sync-row removed"><div><div class="sync-row-name">${d['Company name']}</div><div class="sync-row-meta">${[d['Category'],d['City']].filter(Boolean).join(' · ')}</div></div><span style="font-size:11px;color:var(--error);font-weight:500">− удалится</span></div>`;});
+    }
+    if(changed.length>0){
+      html+=`<div class="sync-section-label">Расхождения <span class="badge-changed">${changed.length}</span></div>`;
+      changed.forEach((item,i)=>{
+        const id=`sd-${i}`;
+        const hasConflict=item.diffs.some(d=>d.local&&d.drive);
+        html+=`<div>
+          <div class="sync-row changed">
+            <div><div class="sync-row-name">${item.drive['Company name']}</div>
+            <div class="sync-row-meta">${item.diffs.length} поля · ${hasConflict?'<span style="color:var(--accent)">есть конфликты</span>':'будут заполнены пустые'}</div></div>
+            <button class="sync-btn-expand" onclick="toggleSyncDiff('${id}',this)">Показать</button>
+          </div>
+          <div class="sync-diff" id="${id}">
+            ${item.diffs.map(df=>{
+              const isConflict=df.local&&df.drive;
+              return`<div class="sync-diff-item">
+                <span class="sync-diff-field">${df.field}</span>
+                <span class="sync-diff-old">${df.local||'—'}</span>
+                <span class="sync-diff-arrow">${isConflict?'⚡':'→'}</span>
+                <span class="sync-diff-new">${df.drive||'—'}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      });
+    }
+  }
+  document.getElementById('syncLoading').style.display='none';
+  document.getElementById('syncContent').style.display='block';
+  document.getElementById('syncContent').innerHTML=html;
+  document.getElementById('syncFooter').style.display='flex';
+  const applyBtn=document.getElementById('syncApplyBtn');
+  const note=document.getElementById('syncFooterNote');
+  if(total>0){
+    applyBtn.style.display='inline-block';
+    const conflicts=changed.reduce((n,it)=>n+it.diffs.filter(d=>d.local&&d.drive).length,0);
+    note.textContent=conflicts>0?`${conflicts} конфликтов — при объединении победит Drive`:`${total} расхождений — пустые поля будут заполнены`;
+  }else{
+    applyBtn.style.display='none';note.textContent='Данные актуальны';
+  }
+}
+function toggleSyncDiff(id,btn){const el=document.getElementById(id);const open=el.classList.toggle('open');btn.textContent=open?'Скрыть':'Показать'}
+function applySyncFromDrive(){
+  if(!syncDriveData)return;
+  const btn=document.getElementById('syncApplyBtn');
+  btn.disabled=true;btn.textContent='Объединяю...';
+  const result=mergeData(data,syncDriveData);
+  data=result.merged;filteredData=[...data];
+  rebuildFilters(`${data.length} компаний`);applyFilters();
+  if(devMode){renderDevTable();renderStats()}
+  scheduleSave();closeSyncModal();
+  const t=new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  result.conflicts.length>0?showConflictToast(result.conflicts,t):showRefreshBadge(`${data.length} компаний · синхр. ${t}`);
+  btn.disabled=false;btn.textContent='Объединить с Drive';
+}
+
+function toggleTheme(){isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');const i=document.getElementById('themeIcon');i.innerHTML=isDark?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'}
+
+function toggleDevMode(){if(!devMode){document.getElementById('loginModal').classList.add('open');document.getElementById('loginUser').focus()}else exitDevMode()}
+function submitLogin(){const u=document.getElementById('loginUser').value,p=document.getElementById('loginPass').value;if(u==='admin'&&p==='admin'){document.getElementById('loginModal').classList.remove('open');document.getElementById('loginError').style.display='none';enterDevMode()}else{document.getElementById('loginError').style.display='block';document.getElementById('loginPass').value=''}}
+function closeLoginModal(){document.getElementById('loginModal').classList.remove('open');document.getElementById('loginError').style.display='none';document.getElementById('loginUser').value='';document.getElementById('loginPass').value=''}
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')submitLogin()});
+document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+function enterDevMode(){devMode=true;document.getElementById('devBar').classList.add('visible');document.getElementById('devBtn').classList.add('dev-active');document.getElementById('aiBtn').style.display='flex';renderStats();renderDevTable();populateAddCat()}
+function exitDevMode(){devMode=false;document.getElementById('devBar').classList.remove('visible');document.getElementById('devPanel').classList.remove('visible');document.getElementById('devBtn').classList.remove('dev-active');document.getElementById('aiBtn').style.display='none'}
+function toggleDevPanel(){document.getElementById('devPanel').classList.toggle('visible');renderStats();renderDevTable()}
+function switchDevTab(tab,btn){document.querySelectorAll('.dev-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.dev-tab-content').forEach(c=>c.classList.remove('active'));btn.classList.add('active');document.getElementById('dev'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');if(tab==='stats')renderStats();if(tab==='table')renderDevTable()}
+function renderStats(){const cats=[...new Set(data.map(d=>d['Category']))],cities=[...new Set(data.map(d=>d['City']).filter(Boolean))],wL=data.filter(d=>(d['Status-L']||'').toLowerCase()==='active').length,wF=data.filter(d=>(d['Status-F']||'').toLowerCase()==='active').length;document.getElementById('statsGrid').innerHTML=`<div class="stat-card"><div class="val">${data.length}</div><div class="lbl">Компаний</div></div><div class="stat-card"><div class="val">${cats.length}</div><div class="lbl">Категорий</div></div><div class="stat-card"><div class="val">${cities.length}</div><div class="lbl">Городов</div></div><div class="stat-card"><div class="val">${wL}</div><div class="lbl">LinkedIn</div></div><div class="stat-card"><div class="val">${wF}</div><div class="lbl">Facebook</div></div><div class="stat-card"><div class="val">${data.filter(d=>d['CEO-1']).length}</div><div class="lbl">С руководством</div></div><div class="stat-card"><div class="val">${data.filter(d=>d['Email']).length}</div><div class="lbl">С Email</div></div><div class="stat-card"><div class="val">${data.filter(d=>d['Website']&&d['Website'].startsWith('http')).length}</div><div class="lbl">С сайтом</div></div>`}
+function renderDevTable(){const q=(document.getElementById('devSearch')?.value||'').toLowerCase(),rows=data.filter(d=>!q||JSON.stringify(d).toLowerCase().includes(q)),cols=['Company name','Category','City','Email','CEO-1'];document.getElementById('dbTableWrap').innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}<th></th></tr></thead><tbody>${rows.map(d=>{const ri=data.indexOf(d);return`<tr>${cols.map(c=>`<td title="${(d[c]||'').replace(/"/g,'&quot;')}">${d[c]||'—'}</td>`).join('')}<td><div class="td-actions"><button class="btn-icon" onclick="openEditModal(${ri})">✎</button><button class="btn-icon del" onclick="deleteRecord(${ri})">✕</button></div></td></tr>`}).join('')}</tbody></table>`}
+function deleteRecord(idx){if(!devMode)return;if(!confirm(`Удалить "${data[idx]['Company name']}"?`))return;data.splice(idx,1);rebuildFilters();applyFilters();renderDevTable();renderStats();scheduleSave()}
+function openEditModal(idx){if(!devMode)return;editingIdx=idx;const d=data[idx],fields=['Company name','Category','City','Website','Email','Phone','Address','CEO-1','Position-1','CEO-2','Position-2','Linkedin','Status-L','Facebook','Status-F'];document.body.insertAdjacentHTML('beforeend',`<div style="position:fixed;inset:0;background:rgba(10,8,6,.55);z-index:600;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center" id="editOverlay" onclick="closeEditIfBg(event)"><div style="background:var(--surface);border-radius:16px;width:580px;max-height:84vh;overflow-y:auto;padding:26px;box-shadow:var(--shadow-lg)"><div style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center">Редактировать запись<button onclick="document.getElementById('editOverlay').remove()" style="border:1px solid var(--border);border-radius:50%;width:30px;height:30px;background:transparent;cursor:pointer;font-size:15px;color:var(--muted)">✕</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">${fields.map(f=>`<div${f==='Address'?' style="grid-column:1/-1"':''}><label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px">${f}</label><input class="edit-field" type="text" id="ef-${f.replace(/\s/g,'-').replace(/[^a-zA-Z0-9-]/g,'_')}" value="${(d[f]||'').replace(/"/g,'&quot;')}"></div>`).join('')}</div><div style="display:flex;gap:7px;justify-content:flex-end;margin-top:18px"><button class="btn-secondary" onclick="document.getElementById('editOverlay').remove()">Отмена</button><button class="btn-primary" onclick="saveEdit(${idx},[${fields.map(f=>`'${f.replace(/'/g,"\\'")}'`).join(',')}])">Сохранить</button></div></div></div>`)}
+function closeEditIfBg(e){if(e.target.id==='editOverlay')e.target.remove()}
+function saveEdit(idx,fields){if(!devMode)return;fields.forEach(f=>{const el=document.getElementById('ef-'+f.replace(/\s/g,'-').replace(/[^a-zA-Z0-9-]/g,'_'));if(el)data[idx][f]=el.value.trim()});document.getElementById('editOverlay')?.remove();rebuildFilters();applyFilters();renderDevTable();renderStats();scheduleSave()}
+function populateAddCat(){const sel=document.getElementById('af-cat'),cats=[...new Set(data.map(d=>d['Category']))].sort();sel.innerHTML='<option value="">— Выбрать —</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('')}
+function addRecord(){if(!devMode)return;const name=document.getElementById('af-name').value.trim();if(!name){showAddStatus('Введите название','error');return}const entry={'Company name':name,'Category':document.getElementById('af-cat').value,'Status':'Активный','City':document.getElementById('af-city').value.trim(),'Website':document.getElementById('af-web').value.trim(),'Email':document.getElementById('af-email').value.trim(),'Phone':document.getElementById('af-phone').value.trim(),'Address':document.getElementById('af-addr').value.trim(),'CEO-1':document.getElementById('af-ceo1').value.trim(),'Position-1':document.getElementById('af-pos1').value.trim(),'CEO-2':'','Position-2':'','Linkedin':document.getElementById('af-li').value.trim(),'Status-L':document.getElementById('af-li').value.trim()?'Active':'','Facebook':document.getElementById('af-fb').value.trim(),'Status-F':document.getElementById('af-fb').value.trim()?'Active':''};data.push(entry);rebuildFilters();applyFilters();renderDevTable();renderStats();clearAddForm();showAddStatus(`Компания "${name}" добавлена`,'success');scheduleSave()}
+function clearAddForm(){['af-name','af-cat','af-city','af-web','af-email','af-phone','af-addr','af-ceo1','af-pos1','af-li','af-fb'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''})}
+function showAddStatus(msg,type){const el=document.getElementById('addStatus');el.textContent=msg;el.className='status-msg '+type;el.style.display='block';setTimeout(()=>{el.style.display='none'},4000)}
+function clearDatabase(){if(!devMode)return;if(!confirm('Удалить все данные?'))return;data=[];filteredData=[];rebuildFilters();applyFilters();renderDevTable();renderStats();scheduleSave()}
+function exportData(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kz_business_db.json';a.click()}
+function exportCsv(){const cols=['Company name','Category','Status','City','Website','Email','Phone','Address','CEO-1','Position-1','CEO-2','Position-2','Linkedin','Status-L','Facebook','Status-F'],rows=[cols.join(',')];data.forEach(d=>{rows.push(cols.map(c=>`"${(d[c]||'').replace(/"/g,'""')}"`).join(','))});const b=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kz_business_db.csv';a.click()}
+
+// AI PARSER
+function openAiModal(){if(!devMode)return;document.getElementById('aiModal').classList.add('open');document.getElementById('aiResult').classList.remove('visible');document.getElementById('aiAddBtn').style.display='none';document.getElementById('aiEditToggle').style.display='none';document.getElementById('aiEditSection').style.display='none';document.getElementById('aiParseBtn').style.display='inline-block';document.getElementById('aiParseBtn').textContent='Найти в интернете';document.getElementById('aiInput').value='';parsedAiCompany=null;setTimeout(()=>document.getElementById('aiInput').focus(),100)}
+function closeAiModal(){document.getElementById('aiModal').classList.remove('open')}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter')runAiParse()})});
+async function runAiParse(){const cn=document.getElementById('aiInput').value.trim();if(!cn){document.getElementById('aiInput').focus();return}document.getElementById('aiLoading').classList.add('visible');document.getElementById('aiResult').classList.remove('visible');['aiEditSection','aiEditToggle','aiAddBtn'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('aiParseBtn').disabled=true;parsedAiCompany=null;const cats=[...new Set(data.map(d=>d['Category']))].filter(Boolean).join(', '),lt=document.getElementById('aiLoadingText'),steps=['Ищу в интернете...','Анализирую сайт...','Извлекаю данные...','Формирую запись...'];let si=0;const sv=setInterval(()=>{si=(si+1)%steps.length;lt.textContent=steps[si]},2200);try{const r=await fetch(`${SERVER}/api/search`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company:cn,categories:cats})});clearInterval(sv);if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||`Error ${r.status}`)}const res=await r.json();if(!res.success)throw new Error(res.error);parsedAiCompany=res.data;parsedAiCompany['Status']='Активный';if(!parsedAiCompany['Company name'])parsedAiCompany['Company name']=cn;const fl={'Company name':'Название','Category':'Категория','City':'Город','Website':'Сайт','Email':'Email','Phone':'Телефон','Address':'Адрес','CEO-1':'Руководитель','Position-1':'Должность','CEO-2':'Руководитель 2','Position-2':'Должность 2','Linkedin':'LinkedIn','Facebook':'Facebook','Status-L':'LinkedIn','Status-F':'Facebook'},filled=Object.entries(fl).filter(([k])=>parsedAiCompany[k]&&!['Active','Not Active','Активный'].includes(parsedAiCompany[k]));document.getElementById('aiResultCard').innerHTML=filled.map(([k,l])=>`<div class="ai-result-field"><span class="ai-result-key">${l}</span><span class="ai-result-val">${parsedAiCompany[k]}</span></div>`).join('')||'<div style="color:var(--muted);font-size:13px;padding:8px">Данные не найдены.</div>';document.getElementById('aiSourceBadge').textContent=`${filled.length} полей`;buildAiEditFields(fl);document.getElementById('aiResult').classList.add('visible');if(filled.length>0){document.getElementById('aiAddBtn').style.display='inline-block';document.getElementById('aiEditToggle').style.display='inline-block'}document.getElementById('aiParseBtn').textContent='Найти снова'}catch(e){clearInterval(sv);document.getElementById('aiResultCard').innerHTML=`<div style="color:var(--error);font-size:13px;padding:8px">${e.message}</div>`;document.getElementById('aiSourceBadge').textContent='Ошибка';document.getElementById('aiSourceBadge').style.background='var(--error-bg)';document.getElementById('aiSourceBadge').style.color='var(--error)';document.getElementById('aiResult').classList.add('visible')}document.getElementById('aiLoading').classList.remove('visible');document.getElementById('aiParseBtn').disabled=false}
+function buildAiEditFields(fl){const c=document.getElementById('aiEditFields'),ef=['Company name','Category','City','Website','Email','Phone','Address','CEO-1','Position-1','CEO-2','Position-2','Linkedin','Facebook'];c.innerHTML=ef.map(f=>`<div${f==='Address'?' style="grid-column:1/-1"':''}><label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:3px">${fl[f]||f}</label><input type="text" id="aie-${f.replace(/[^a-zA-Z0-9]/g,'_')}" value="${(parsedAiCompany[f]||'').replace(/"/g,'&quot;')}" style="width:100%;padding:6px 9px;font-size:12.5px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text);font-family:var(--font-ui);outline:none" oninput="updateParsedField('${f}',this.value)"></div>`).join('')}
+function updateParsedField(f,v){if(parsedAiCompany)parsedAiCompany[f]=v}
+function toggleAiEdit(){const s=document.getElementById('aiEditSection'),b=document.getElementById('aiEditToggle'),v=s.style.display!=='none'&&s.style.display!=='';s.style.display=v?'none':'block';b.textContent=v?'Редактировать':'Скрыть'}
+function addParsedCompany(){if(!parsedAiCompany||!parsedAiCompany['Company name'])return;const ei=data.findIndex(d=>d['Company name'].trim().toLowerCase()===parsedAiCompany['Company name'].trim().toLowerCase());if(ei!==-1){Object.keys(parsedAiCompany).forEach(k=>{if(parsedAiCompany[k])data[ei][k]=parsedAiCompany[k]})}else{data.push(parsedAiCompany)}rebuildFilters();applyFilters();if(devMode){renderDevTable();renderStats()}closeAiModal();document.getElementById('aiInput').value='';scheduleSave()}
+
+// FILTERS
+function rebuildFilters(label){const cats=[...new Set(data.map(d=>d['Category']))].filter(Boolean).sort(),ca=[...new Set(data.map(d=>d['City']).filter(Boolean))].sort();document.getElementById('count-all').textContent=data.length;document.getElementById('totalCount').textContent=data.length;if(label)document.getElementById('lastUpdated').textContent=label;else document.getElementById('lastUpdated').textContent=`${data.length} компаний`;const cc=document.getElementById('catButtons');cc.innerHTML='';cats.forEach(cat=>{const cnt=data.filter(d=>d['Category']===cat).length,b=document.createElement('button');b.className='cat-btn'+(currentCat===cat?' active':'');b.dataset.cat=cat;b.onclick=function(){filterCat(cat,this)};b.innerHTML=`<span style="flex:1">${cat}</span><span class="cat-count">${cnt}</span>`;cc.appendChild(b)});const cs=document.getElementById('citySelect'),pc=cs.value;cs.innerHTML='<option value="">Все города</option>';ca.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o)});if(pc)cs.value=pc}
+function filterCat(cat,btn){currentCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');applyFilters()}
+function applyFilters(){const q=document.getElementById('searchInput').value.toLowerCase();currentCity=document.getElementById('citySelect').value;filteredData=data.filter(d=>{const mc=currentCat==='all'||d['Category']===currentCat,mci=!currentCity||d['City']===currentCity,mq=!q||(d['Company name']||'').toLowerCase().includes(q)||(d['CEO-1']||'').toLowerCase().includes(q)||(d['CEO-2']||'').toLowerCase().includes(q)||(d['City']||'').toLowerCase().includes(q)||(d['Email']||'').toLowerCase().includes(q)||(d['Category']||'').toLowerCase().includes(q);return mc&&mci&&mq});document.getElementById('shownCount').textContent=filteredData.length;renderCards()}
+
+// VIEW
+function setView(mode){viewMode=mode;document.getElementById('gridBtn').classList.toggle('active',mode==='grid');document.getElementById('listBtn').classList.toggle('active',mode==='list');document.getElementById('companiesGrid').className=mode==='list'?'list':'grid';renderCards()}
+
+// CARDS
+function badge(p,s){if(!s)return '';const a=s.toLowerCase()==='active';return`<span class="badge ${a?'active':'inactive'}">${p} ${a?'✓':'○'}</span>`}
+function renderCards(){const g=document.getElementById('companiesGrid');if(!filteredData.length){g.innerHTML=`<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><h3>Компании не найдены</h3><p>Попробуйте изменить фильтры</p></div>`;return}
+if(viewMode==='list'){g.innerHTML=filteredData.map(d=>{const ri=data.indexOf(d);return`<div class="card" onclick="openModal(${ri})"><div><div class="company-name">${d['Company name']}</div><span class="cat-tag">${d['Category']||'—'}</span></div><div class="card-row"><svg width="11" height="11" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${d['City']||'—'}</div><div class="card-ceo">${d['CEO-1']?`<div class="card-ceo-name">${d['CEO-1']}</div><div class="card-ceo-label">${(d['Position-1']||'').substring(0,38)}</div>`:'<span style="color:var(--muted);font-size:12px">—</span>'}</div><div class="social-badges">${badge('LI',d['Status-L'])}${badge('FB',d['Status-F'])}</div><svg width="12" height="12" viewBox="0 0 24 24" style="color:var(--muted);stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round"><path d="m9 18 6-6-6-6"/></svg></div>`}).join('');return}
+g.innerHTML=filteredData.map(d=>{const ri=data.indexOf(d);return`<div class="card" onclick="openModal(${ri})"><div class="card-header"><div class="company-name">${d['Company name']}</div><div class="status-dot"></div></div><span class="cat-tag">${d['Category']||'—'}</span>${d['City']?`<div class="card-row"><svg width="11" height="11" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${d['City']}</div>`:''}${d['Email']&&!d['Email'].includes('\n')?`<div class="card-row"><svg width="11" height="11" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><a href="mailto:${d['Email'].split(',')[0].trim()}" onclick="event.stopPropagation()">${d['Email'].split(',')[0].trim()}</a></div>`:''}${d['CEO-1']?`<div class="card-ceo"><div class="card-ceo-label">Руководство</div><div class="card-ceo-name">${d['CEO-1']}</div>${d['Position-1']?`<div class="person-pos-short">${d['Position-1'].length>55?d['Position-1'].substring(0,55)+'…':d['Position-1']}</div>`:''}</div>`:''}<div class="social-badges">${badge('LinkedIn',d['Status-L'])}${badge('Facebook',d['Status-F'])}</div></div>`}).join('')}
+
+// MODAL
+function openModal(idx){const d=data[idx],site=d['Website']&&d['Website'].startsWith('http')?d['Website']:null,li=d['Linkedin']?`https://linkedin.com/company/${d['Linkedin']}`:null,fb=d['Facebook']?`https://facebook.com/${d['Facebook']}`:null,em=d['Email']?d['Email'].split('\n')[0].split(',')[0].trim():'';document.getElementById('modalContent').innerHTML=`<div class="modal-cat">${d['Category']}</div><div class="modal-title">${d['Company name']}</div><div class="modal-section"><h4>Контактная информация</h4>${d['City']?`<div class="info-row"><span class="info-label">Город</span><span class="info-value">${d['City']}</span></div>`:''}${d['Phone']?`<div class="info-row"><span class="info-label">Телефон</span><span class="info-value">${d['Phone']}</span></div>`:''}${em?`<div class="info-row"><span class="info-label">Email</span><span class="info-value"><a href="mailto:${em}">${em}</a></span></div>`:''}${site?`<div class="info-row"><span class="info-label">Сайт</span><span class="info-value"><a href="${site}" target="_blank">${site}</a></span></div>`:''}${d['Address']?`<div class="info-row"><span class="info-label">Адрес</span><span class="info-value">${d['Address']}</span></div>`:''}</div>${(d['CEO-1']||d['CEO-2'])?`<div class="modal-section"><h4>Руководство</h4>${d['CEO-1']?`<div class="person-card"><div class="person-role">Руководитель</div><div class="person-name">${d['CEO-1']}</div>${d['Position-1']?`<div class="person-pos">${d['Position-1']}</div>`:''}</div>`:''}${d['CEO-2']?`<div class="person-card"><div class="person-role">Второй руководитель</div><div class="person-name">${d['CEO-2']}</div>${d['Position-2']?`<div class="person-pos">${d['Position-2']}</div>`:''}</div>`:''}</div>`:''}<div class="modal-section"><h4>Социальные сети</h4><div style="display:flex;gap:7px;flex-wrap:wrap">${li?`<a href="${li}" target="_blank" class="social-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn <span style="color:var(--accent);font-size:10.5px">${d['Status-L']}</span></a>`:'<span class="social-link" style="cursor:default;opacity:.4">LinkedIn — нет</span>'}${fb?`<a href="${fb}" target="_blank" class="social-link"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>Facebook <span style="color:var(--accent);font-size:10.5px">${d['Status-F']}</span></a>`:'<span class="social-link" style="cursor:default;opacity:.4">Facebook — нет</span>'}</div></div>${devMode?`<div class="modal-section"><h4>Действия</h4><div style="display:flex;gap:7px"><button class="btn-sm" onclick="openEditModal(${idx});closeModal(null,true)">Редактировать</button><button class="btn-sm" style="background:var(--error-bg);color:var(--error);border:1px solid var(--error)" onclick="deleteRecord(${idx});closeModal(null,true)">Удалить</button></div></div>`:''}`;document.getElementById('overlay').classList.add('open')}
+function closeModal(e,force){if(force||(e&&e.target===document.getElementById('overlay')))document.getElementById('overlay').classList.remove('open')}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal(null,true);closeAiModal();closeLoginModal();closeSyncModal()}});
+
+function init(){document.getElementById('searchInput').addEventListener('input',applyFilters);renderCards();autoLoad()}
+init();
+</script>
+</body>
+</html>
